@@ -55,6 +55,10 @@ tests = do
         Assert.equal
           (Just 176)
           (largestNumber [3, 7, 5, 176, 12])
+      test "returns largest number from one" do
+        Assert.equal
+          (Just 15)
+          (largestNumber [15])
       test "doesn't return a value if no numbers are given" do
         Assert.equal
           Nothing
@@ -89,7 +93,6 @@ unwrapId (AdminId id) = id
 
 largestNumber :: Array Int -> Maybe Int
 largestNumber [] = Nothing
-largestNumber [a] = Just a
 largestNumber x = case (head x) of
   Just a -> Just $ foldl (\i j -> max i j) a x
   _ -> Nothing
