@@ -78,9 +78,9 @@ pi :: Number
 pi = 3.14
       
 area :: Shape -> Number
-area (Circle pt rad) = pi * rad * rad
-area (Rectangle pt width height) = width * height
-area _ = 0.0
+area (Circle _ rad) = pi * rad * rad
+area (Rectangle _ width height) = width * height
+area (Line _ _) = 0.0
 
 newtype AdminId = AdminId String
 
