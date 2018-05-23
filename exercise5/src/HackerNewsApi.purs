@@ -16,7 +16,9 @@ type QueryResult =
 type Story = 
   { created_at :: String
   , objectID :: String
+  , author :: String
   , points :: Int
+  , num_comments :: Int
   , title :: String
   , url :: String }
 

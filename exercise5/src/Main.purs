@@ -92,6 +92,10 @@ storyItem story =
   div ! style (marginBottom (px 5.0)) ! key story.objectID $ do
     a ! href story.url $ text story.title
     div do
+      div ! style Styles.points $ text story.author
+      divider
+      div ! style Styles.points $ text (show story.num_comments <> " comments")
+      divider
       div ! style Styles.points $ text (show story.points <> " points")
       divider
       div ! style Styles.date $ text (formatTime story.created_at)
