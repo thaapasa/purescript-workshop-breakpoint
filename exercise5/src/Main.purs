@@ -7,7 +7,7 @@ import Control.Monad.Aff (Aff)
 import Control.Monad.Aff.Console (log)
 import Control.Monad.Eff (Eff)
 import Data.Array as Array
-import Data.Either (Either(Left,Right))
+import Data.Either (Either(Left, Right))
 import Data.Foldable (for_)
 import Data.Maybe (Maybe(Just, Nothing))
 import HackerReader.HackerNewsApi (Story, fetchHackerNewsStories)
@@ -18,7 +18,8 @@ import Pux.DOM.HTML (HTML)
 import Pux.DOM.HTML.Attributes (key, style)
 import Pux.Renderer.React (renderToDOM)
 import Signal (constant)
-import Text.Smolder.HTML (div, h1, span)
+import Text.Smolder.HTML (div, h1, span, a)
+import Text.Smolder.HTML.Attributes (href)
 import Text.Smolder.Markup (text, (!), (#!))
 
 data Event
@@ -89,7 +90,7 @@ storySort ByScore {points: points1} {points: points2} = points2 `compare` points
 storyItem :: Story -> HTML Event
 storyItem story =
   div ! style (marginBottom (px 5.0)) ! key story.objectID $ do
-    text story.objectID
+    a ! href story.url $ text story.title
     div do
       div ! style Styles.points $ text (show story.points <> " points")
       divider
