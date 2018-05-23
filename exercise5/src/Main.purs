@@ -6,39 +6,45 @@ import CSS (marginBottom, px)
 import Control.Monad.Aff (Aff)
 import Control.Monad.Aff.Console (log)
 import Control.Monad.Eff (Eff)
+import Control.Monad.List.Trans (filter)
 import Data.Array as Array
 import Data.Either (Either(Left, Right))
 import Data.Foldable (for_)
 import Data.Maybe (Maybe(Just, Nothing))
+import Data.String (Pattern(..), contains)
 import HackerReader.HackerNewsApi (Story, fetchHackerNewsStories)
 import HackerReader.Styles as Styles
 import Pux as Pux
-import Pux.DOM.Events (onClick)
+import Pux.DOM.Events (onChange, onClick, targetValue)
 import Pux.DOM.HTML (HTML)
 import Pux.DOM.HTML.Attributes (key, style)
 import Pux.Renderer.React (renderToDOM)
+import React.DOM.Props (x)
 import Signal (constant)
-import Text.Smolder.HTML (div, h1, span, a)
-import Text.Smolder.HTML.Attributes (href)
+import Text.Smolder.HTML (a, div, h1, input, span)
+import Text.Smolder.HTML.Attributes (href, type')
 import Text.Smolder.Markup (text, (!), (#!))
 
 data Event
   = LoadFrontPage
   | SetStories (Array Story)
   | SetSortBy SortBy
+  | SetFilter String
 
 data SortBy = ByScore | ByTime
 
 type State =
   { selectedSort :: SortBy
-  , stories :: Array Story }
+  , stories :: Array Story
+  , filter :: String }
 
 foreign import formatTime :: String -> String
 
 initialState :: State
 initialState =
   { selectedSort: ByScore
-  , stories: [] }
+  , stories: []
+  , filter: "" }
 
 foldp :: Event -> State -> { state :: State, effects :: Array (Aff _ (Maybe Event)) }
 foldp (LoadFrontPage) state = { state, effects: [loadHackerNewsStories] }
@@ -46,6 +52,8 @@ foldp (SetStories stories) state = { state: newState, effects: [] }
   where newState = state { stories = stories }
 foldp (SetSortBy newSort) state = { state: newState, effects: [] }
   where newState = state { selectedSort = newSort }
+foldp (SetFilter newFilter) state = { state: newState, effects: [] }
+  where newState = state { filter = newFilter }
 
 loadHackerNewsStories :: Aff _ (Maybe Event)
 loadHackerNewsStories = do
@@ -57,7 +65,7 @@ loadHackerNewsStories = do
     Right stories -> pure $ Just (SetStories stories)
 
 view :: State -> HTML Event
-view {selectedSort, stories} = do
+view {selectedSort, stories, filter} = do
   div ! style Styles.header $ do
     h1
       ! style Styles.headerTitle
@@ -69,15 +77,23 @@ view {selectedSort, stories} = do
       div ! style (sortItemStyle ByTime)
         #! onClick (\_ -> SetSortBy ByTime)
         $ text "Sort by date"
+    div ! style Styles.sort $ do
+      input ! type' "text"
+        #! onChange (\x -> SetFilter (targetValue x))
   div ! style Styles.content $ do
     for_ sortedStories storyItem
   where
-    sortedStories = Array.sortBy (storySort selectedSort) stories
+    sortedStories = Array.sortBy (storySort selectedSort) (filterStories filter stories)
     sortItemStyle sort =
       if isSortSelected selectedSort sort
          then Styles.selected
          else Styles.unselected
-      
+
+filterStories :: String -> Array Story -> Array Story
+filterStories "" s = s
+filterStories _ [] = []
+filterStories f a = Array.filter (\s -> contains (Pattern f) s.title) a
+
 isSortSelected :: SortBy -> SortBy -> Boolean
 isSortSelected ByTime ByTime = true
 isSortSelected ByScore ByScore = true
@@ -96,7 +112,7 @@ storyItem story =
       divider
       div ! style Styles.points $ text (show story.num_comments <> " comments")
       divider
-      div ! style Styles.points $ text (show story.points <> " points")
+      div ! style Styles.numComments $ text (show story.points <> " points")
       divider
       div ! style Styles.date $ text (formatTime story.created_at)
 
