@@ -129,22 +129,22 @@ hackerNewsStories = [
 type Address = { street :: String, city :: String }
 
 getStreet :: Address -> String
-getStreet address = address.street
+getStreet = _.street
 
 updateStreet :: String -> Address -> Address
-updateStreet newStreet address = address { street = newStreet }
+updateStreet newStreet = _ { street = newStreet }
 
 showAddress :: Address -> String
 showAddress address = address.street <> ", " <> address.city
 
 sumNumbers :: Array Int -> Int
-sumNumbers nums = sum nums
+sumNumbers = sum
 
 listAuthors :: Array Story -> Array String
-listAuthors stories = map (\s -> s.author) stories
+listAuthors = map (\s -> s.author)
 
 listHighPointStoryIds :: Array Story -> Array String
 listHighPointStoryIds stories = map (\s -> s.objectID) $ Array.filter (\s -> s.points > 100) stories
 
 philStories :: Array Story -> Array Story
-philStories stories = Array.filter (\s -> eq s.author "paf31") stories
+philStories = Array.filter (\s -> eq s.author "paf31")
