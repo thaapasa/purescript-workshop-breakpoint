@@ -11,7 +11,7 @@ import Data.Array as Array
 import Data.Either (Either(Left, Right))
 import Data.Foldable (for_)
 import Data.Maybe (Maybe(Just, Nothing))
-import Data.String (Pattern(..), contains)
+import Data.String (Pattern(..), contains, toLower)
 import HackerReader.HackerNewsApi (Story, fetchHackerNewsStories)
 import HackerReader.Styles as Styles
 import Pux as Pux
@@ -92,7 +92,7 @@ view {selectedSort, stories, filter} = do
 filterStories :: String -> Array Story -> Array Story
 filterStories "" s = s
 filterStories _ [] = []
-filterStories f a = Array.filter (\s -> contains (Pattern f) s.title) a
+filterStories f a = Array.filter (\s -> contains (Pattern (toLower f)) (toLower s.title)) a
 
 isSortSelected :: SortBy -> SortBy -> Boolean
 isSortSelected ByTime ByTime = true
