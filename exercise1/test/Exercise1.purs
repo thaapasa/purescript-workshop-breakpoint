@@ -3,6 +3,7 @@ module Test.Exercise1 where
 import Prelude
 
 import Control.Monad.Eff (Eff)
+import Data.Array (foldl)
 import Data.Array as Array
 import Data.Foldable (all, sum)
 import Data.Tuple (Tuple(Tuple))
@@ -138,10 +139,10 @@ showAddress :: Address -> String
 showAddress { street: s, city: c } = s <> ", " <> c
 
 sumNumbers :: Array Int -> Int
-sumNumbers = sum
+sumNumbers = foldl (\a b -> a + b) 0
 
 listAuthors :: Array Story -> Array String
-listAuthors = map (\s -> s.author)
+listAuthors = map _.author
 
 listHighPointStoryIds :: Array Story -> Array String
 listHighPointStoryIds stories = map (\s -> s.objectID) $ Array.filter (\s -> s.points > 100) stories
