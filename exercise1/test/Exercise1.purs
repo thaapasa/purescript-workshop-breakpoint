@@ -135,7 +135,7 @@ updateStreet :: String -> Address -> Address
 updateStreet newStreet = _ { street = newStreet }
 
 showAddress :: Address -> String
-showAddress address = address.street <> ", " <> address.city
+showAddress { street: s, city: c } = s <> ", " <> c
 
 sumNumbers :: Array Int -> Int
 sumNumbers = sum
